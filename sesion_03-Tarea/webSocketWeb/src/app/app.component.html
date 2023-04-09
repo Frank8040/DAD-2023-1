@@ -1,0 +1,65 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div id="main-content" class="container">
+  <div class="sub-container">
+    <div class="col-md-6">
+      <form class="form-inline">
+        <div class="form-group">
+          <label>Conexion de WebSocket:</label>
+          <button
+            (click)="conectar()"
+            class="btn btn-default"
+            type="submit"
+            [disabled]="conectado"
+            [ngClass]="{ conectado: conectado }"
+          >
+            Conectar
+          </button>
+          <button
+            (click)="desconectar()"
+            class="btn btn-default"
+            type="submit"
+            [disabled]="!conectado"
+          >
+            Desconectar
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <form class="form-inline">
+        <div class="chat-container" #chatContainer>
+          <ng-container *ngFor="let mensaje of mensajes">
+            <div
+              [class]="
+                'chat-subcontainer ' + (enviado ? 'enviado' : 'recibido')
+              "
+            >
+              <p [class]="enviado ? 'p-enviado' : 'p-recibido'">
+                {{ mensaje.cuerpo }}
+              </p>
+            </div>
+          </ng-container>
+        </div>
+        <div class="enviar">
+          <label>Envia un mensaje</label>
+          <div class="input-button">
+            <input
+              type="text"
+              [(ngModel)]="data"
+              class="form-control"
+              name="name"
+            />
+            <button
+              (click)="enviarMensaje()"
+              class="btn btn-default button_3"
+              type="submit"
+              [disabled]="!data || data.trim().length === 0"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

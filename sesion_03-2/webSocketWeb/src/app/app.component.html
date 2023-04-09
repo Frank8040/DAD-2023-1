@@ -1,0 +1,47 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div id="main-content" class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <form class="form-inline">
+        <div class="form-group">
+          <label>Conexion de WebSocket:</label>
+          <button
+            (click)="conectar()"
+            class="btn btn-default"
+            type="submit"
+            [disabled]="conectado"
+            [ngClass]="{ conectado: conectado }"
+          >
+            Conectar
+          </button>
+          <button
+            (click)="desconectar()"
+            class="btn btn-default"
+            type="submit"
+            [disabled]="!conectado"
+          >
+            Desconectar
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <form class="form-inline">
+        <div class="form-group">
+          <label>Envia un mensaje</label>
+          <input
+            type="text"
+            [(ngModel)]="data"
+            class="form-control"
+            name="name"
+          />
+          <br />
+        </div>
+        <button (click)="enviarMensaje()" class="btn btn-default" type="submit">
+          Enviar
+        </button>
+      </form>
+    </div>
+    <p>{{ mensaje.mensaje }}</p>
+  </div>
+</div>

@@ -1,0 +1,90 @@
+.sub-container {
+  padding: 20px;
+  margin: auto;
+  @media (min-width: 767px) {
+    width: 700px;
+  }
+}
+input[type="text"],
+select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  background-color: #d7433e;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button_3 {
+  width: 20%;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.conectado {
+  background-color: #3ed745;
+}
+
+.chat-container {
+  max-width: 700px;
+  padding: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fff;
+  box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
+  height: 300px;
+  max-height: 600px;
+  position: relative;
+  overflow-y: auto;
+}
+.chat-subcontainer {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  position: relative;
+}
+.p-recibido {
+  padding: 2px 10px 2px 10px;
+  background-color: rgb(125, 121, 121);
+  margin: 2px 10px 2px 10px;
+  border-radius: 5px;
+}
+.p-enviado {
+  padding: 2px 10px 2px 10px;
+  background-color: rgb(207, 200, 200);
+  margin: 2px 10px 2px 10px;
+  border-radius: 5px;
+}
+.enviar {
+  padding-top: 20px;
+}
+.input-button {
+  display: flex;
+  gap: 10px;
+}
+label {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.enviado {
+  text-align: right;
+  font-weight: 'bold';
+}
+
+.recibido {
+  text-align: left;
+  font-weight: 'bold';
+}
