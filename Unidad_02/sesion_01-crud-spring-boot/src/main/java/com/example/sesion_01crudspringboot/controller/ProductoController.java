@@ -16,21 +16,29 @@ public class ProductoController {
 
     @GetMapping()
     public List<Producto> listar() {
-        return productoService.listar();
+        List<Producto> productos = productoService.listar();
+        for (Producto producto : productos) {
+            producto.setCategoria(producto.getCategoria());
+        }
+        return productos;
     }
 
     @PostMapping()
     public Producto guardar(@RequestBody Producto producto) {
+        producto.setCategoria(producto.getCategoria());
         return productoService.guardar(producto);
     }
 
     @GetMapping("/{id}")
     public Producto buscarPorId(@PathVariable(required = true) Integer id) {
-        return productoService.listarPorId(id).get();
+        Producto producto = productoService.listarPorId(id).get();
+        producto.setCategoria(producto.getCategoria());
+        return producto;
     }
 
     @PutMapping()
     public Producto actualizar(@RequestBody Producto producto) {
+        producto.setCategoria(producto.getCategoria());
         return productoService.actualizar(producto);
     }
 
