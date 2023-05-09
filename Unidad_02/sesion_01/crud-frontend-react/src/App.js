@@ -1,8 +1,8 @@
 import "./App.css";
-import Catalogos from "./pages/Catalogos";
+import Cliente from "./pages/Cliente";
 
 function App() {
-  return <Catalogos />;
+  return <Cliente />;
 }
 
 export default App;

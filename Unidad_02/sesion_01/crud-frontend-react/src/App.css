@@ -37,13 +37,14 @@
 
 .encabezado-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   grid-gap: 1rem;
   border-radius: 5px;
   background-color: #08a045;
   color: #fff;
   font-weight: bold;
   text-align: center;
+  align-items: center;
 }
 
 .encabezado-title {
@@ -59,7 +60,7 @@
 
 .productos-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   grid-gap: 1rem;
   align-items: center;
   border-bottom: 1px solid #ccc;
@@ -154,7 +155,7 @@
 .form-title {
   font-size: 2rem;
   text-align: center;
-  margin-bottom: 2rem;
+  margin: 10px 0px 0px 0px;
 }
 
 .form-campos {
@@ -165,6 +166,8 @@
 .form-input {
   display: grid;
   margin: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 .label-name {
@@ -176,7 +179,7 @@
 }
 
 .input-name {
-  width: 20rem;
+  width: 10rem;
   padding: 0.5rem;
   font-size: 1rem;
   border-radius: 5px;
@@ -187,7 +190,7 @@
 .btn-actualizar-crear {
   display: flex;
   justify-content: center;
-  padding-top: 2rem;
+  padding-top: 0.5rem;
 }
 
 .actualizar-btn {
