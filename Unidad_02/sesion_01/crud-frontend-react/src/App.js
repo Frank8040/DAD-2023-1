@@ -1,8 +1,8 @@
 import "./App.css";
-import Cliente from "./pages/Cliente";
+import Table from "./components/Table";
 
 function App() {
-  return <Cliente />;
+  return <Table />;
 }
 
 export default App;

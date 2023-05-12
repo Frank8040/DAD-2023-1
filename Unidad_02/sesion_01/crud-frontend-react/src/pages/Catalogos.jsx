@@ -2,22 +2,22 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Input from "../components/Input";
-import Label from "../components/Label";
 
 import Modal from 'react-modal';
 
 const Catalogos = () => {
-  const API_URL = "http://localhost:8181";
+  const API_URL = "http://localhost:9090";
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [productos, setProductos] = useState([]);
   const [productoEditado, setProductoEditado] = useState({
-    id: null,
-    nombre: "",
+    categoriaId: null,
+    categoriaName: "",
+    categoriaDescription: "",
   });
 
-  const getProductos = () => {
+  const getCategorias = () => {
     axios
-      .get(`${API_URL}/producto`)
+      .get(`${API_URL}/categoria`)
       .then((response) => {
         // handle success
         setProductos(response.data);
@@ -29,27 +29,26 @@ const Catalogos = () => {
   }
 
   const editarProducto = (id) => {
-    const producto = productos.find((p) => p.id === id);
+    const producto = productos.find((p) => p.categoriaId === id);
     setProductoEditado({
-      id: producto.id,
-      nombre: producto.nombre,
+      categoriaId: producto.categoriaId,
+      categoriaName: producto.categoriaName,
+      categoriaDescription: producto.categoriaDescription,
     });
     setModalIsOpen(true)
   }
 
   const crearProducto = (event) => {
     event.preventDefault();
-    if (!productoEditado.nombre.trim()) {
-      return; // do nothing if input is empty or only whitespace
-    }
     axios
-      .post(`${API_URL}/producto`, productoEditado)
+      .post(`${API_URL}/categoria`, productoEditado)
       .then((response) => {
         setProductoEditado({
-          id: null,
-          nombre: "",
+          categoriaId: null,
+          categoriaName: "",
+          categoriaDescription: "",
         });
-        getProductos();
+        getCategorias();
         setModalIsOpen(false)
       })
       .catch((error) => {
@@ -60,13 +59,14 @@ const Catalogos = () => {
   const actualizarProducto = (event) => {
     event.preventDefault();
     axios
-      .put(`${API_URL}/producto`, productoEditado)
+      .put(`${API_URL}/categoria`, productoEditado)
       .then((response) => {
         setProductoEditado({
-          id: null,
-          nombre: "",
+          categoriaId: null,
+          categoriaName: "",
+          categoriaDescription: "",
         });
-        getProductos();
+        getCategorias();
         setModalIsOpen(false)
       })
       .catch((error) => {
@@ -76,9 +76,9 @@ const Catalogos = () => {
 
   const eliminarProducto = (id) => {
     axios
-      .delete(`${API_URL}/producto/${id}`)
+      .delete(`${API_URL}/categoria/${id}`)
       .then((response) => {
-        getProductos();
+        getCategorias();
       })
       .catch((error) => {
         console.log(error);
@@ -86,24 +86,34 @@ const Catalogos = () => {
   }
 
   useEffect(() => {
-    getProductos();
+    getCategorias();
   }, []);
 
   const contenidoModal = (
     <div className="form-container">
-      <h2 className="form-title">{productoEditado.id ? 'Editar Producto' : 'Crear Producto'}</h2>
+      <h2 className="form-title">{productoEditado.categoriaId ? 'Editar Producto' : 'Crear Producto'}</h2>
       <Button className="cerrar-modal" onClick={() => setModalIsOpen(false)} title="X" />
-      <form onSubmit={productoEditado.id ? actualizarProducto : crearProducto}>
+      <form onSubmit={productoEditado.categoriaId ? actualizarProducto : crearProducto}>
         <div className="form-campos">
           <div className="form-input">
-            <Label className="label-name" title="Nombre:" />
             <Input
               type="text"
-              value={productoEditado.nombre}
+              value={productoEditado.categoriaName}
               onChange={(event) =>
                 setProductoEditado({
                   ...productoEditado,
-                  nombre: event.target.value,
+                  categoriaName: event.target.value,
+                })
+              }
+              className="input-name"
+            />
+            <Input
+              type="text"
+              value={productoEditado.categoriaDescription}
+              onChange={(event) =>
+                setProductoEditado({
+                  ...productoEditado,
+                  categoriaDescription: event.target.value,
                 })
               }
               className="input-name"
@@ -111,7 +121,7 @@ const Catalogos = () => {
           </div>
         </div>
         <div className="btn-actualizar-crear">
-          {productoEditado.id ? (
+          {productoEditado.categoriaId ? (
             <Button onClick={actualizarProducto} className="actualizar-btn" title="Actualizar" />
           ) : (
             <Button onClick={crearProducto} className="crear-btn" title="Crear Producto" />
@@ -123,12 +133,13 @@ const Catalogos = () => {
 
   return (
     <div className="productos-container">
-      <div className="productos-title">Lista de Productos</div>
+      <div className="productos-title">Lista de Categorías</div>
       <div className="btn_nuevo">
         <Button className="nuevo-btn" onClick={() => {
           setProductoEditado({
-            id: null,
-            nombre: "",
+            categoriaId: null,
+            categoriaName: "",
+            categoriaDescription: "",
           });
           setModalIsOpen(true);
         }} title="Nuevo" />
@@ -138,21 +149,23 @@ const Catalogos = () => {
       </Modal>
       <div className="encabezado-list">
         <p className="encabezado-title" >Nombre</p>
+        <p className="encabezado-title" >Descripción</p>
         <p className="encabezado-title" >Opciones</p>
       </div>
       <div className="container-List">
-        {productos.map((producto) => (
-          <div className="productos-list" key={producto.id}>
-            <h1 className="producto-name">{producto.nombre}</h1>
+        {productos.map((categoria) => (
+          <div className="productos-list" key={categoria.categoriaId}>
+            <h1 className="producto-name">{categoria.categoriaName}</h1>
+            <h1 className="producto-name">{categoria.categoriaDescription}</h1>
             <div className="btn-editar-eliminar">
               <Button
                 className="editar-btn"
-                onClick={() => editarProducto(producto.id)}
+                onClick={() => editarProducto(categoria.categoriaId)}
                 title="E"
               />
               <Button
                 className="eliminar-btn"
-                onClick={() => eliminarProducto(producto.id)}
+                onClick={() => eliminarProducto(categoria.categoriaId)}
                 title="E"
               />
             </div>
