@@ -1,0 +1,7 @@
+{
+  "name": "crud-frontend-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

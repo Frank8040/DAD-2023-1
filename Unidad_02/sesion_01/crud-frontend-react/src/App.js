@@ -1,8 +1,7 @@
-import "./App.css";
-import Table from "./components/Table";
+import Category from "./pages/Categoria";
 
 function App() {
-  return <Table />;
+  return <Category />;
 }
 
 export default App;
