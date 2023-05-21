@@ -5,6 +5,7 @@ import "primereact/resources/primereact.css"; // core css
 import "primeicons/primeicons.css"; // icons
 import "primeflex/primeflex.css";
 import "./index.css";
+import "./App.css";
 import "../src/styles/category.css"
 import App from "./App";
 

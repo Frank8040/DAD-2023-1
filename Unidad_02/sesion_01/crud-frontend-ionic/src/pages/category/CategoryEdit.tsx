@@ -77,9 +77,9 @@ const CategoryEdit: React.FC = () => {
                   <IonLabel position="stacked">Nombre</IonLabel>
                   <IonInput
                     onIonChange={(e) =>
-                      (category.categoriaName = String(e.detail.value))
+                      (category.nombre = String(e.detail.value))
                     }
-                    value={category.categoriaName}
+                    value={category.nombre}
                   >
                     {" "}
                   </IonInput>
@@ -87,12 +87,12 @@ const CategoryEdit: React.FC = () => {
               </IonCol>
               <IonCol>
                 <IonItem>
-                  <IonLabel position="stacked">Descripción</IonLabel>
+                  <IonLabel position="stacked">Estado</IonLabel>
                   <IonInput
                     onIonChange={(e) =>
-                      (category.categoriaDescription = String(e.detail.value))
+                      (category.estado = String(e.detail.value))
                     }
-                    value={category.categoriaDescription}
+                    value={category.estado}
                   >
                     {" "}
                   </IonInput>

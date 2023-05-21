@@ -23,7 +23,7 @@ export default function Product() {
   let datosProduct = {
     id: null,
     nombre: "",
-    imagenId: "",
+    imagen: "",
     categoria: {
       categoriaId: "",
     }
@@ -36,6 +36,7 @@ export default function Product() {
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
   const [product, setProduct] = useState(datosProduct);
   const [selectedProducts, setSelectedProducts] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [modalTitle, setModalTitle] = useState("");
@@ -47,6 +48,11 @@ export default function Product() {
     getProductos();
     getCategorias();
   }, []);
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedImage(file);
+  };
 
   const getProductos = () => {
     axios
@@ -96,35 +102,67 @@ export default function Product() {
   };
 
   const imageBodyTemplate = (rowData) => {
-    return <img src={`data:image/jpeg;base64,${rowData.imagenId}`} alt="Product" className="shadow-2 border-round" style={{ width: '64px' }} />;
+    return <img src={rowData.imagen} alt="Product" className="shadow-2 border-round" style={{ width: '64px' }} />;
+  };
+
+  const uploadImage = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('imageUrl', imageFile);
+
+      axios
+        .post(`${API_URL}/imagen`, formData)
+        .then((response) => {
+          resolve(response.data.imageUrl);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   };
 
   const saveUpdate = () => {
     setSubmitted(true);
 
-    if (product.nombre && product.imagenId && product.categoria.categoriaId) {
-      if (product.id || isCreating === true) { // Corrección en esta línea
+    if (product.nombre && product.imagen && product.categoria.categoriaId) {
+
+      if (product.id || isCreating || selectedImage) { // Corrección en esta línea
         // Actualizar producto existente
-        axios
-          .put(`${API_URL}/producto`, product)
-          .then((response) => {
-            getProductos();
-            getCategorias();
-            setProductDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto actualizado', life: 3000 });
+        uploadImage(selectedImage)
+          .then((imageUrl) => {
+            const updatedProduct = { ...product, imagen: imageUrl };
+
+            axios
+              .put(`${API_URL}/producto`, updatedProduct)
+              .then((response) => {
+                getProductos();
+                getCategorias();
+                setProductDialog(false);
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto actualizado', life: 3000 });
+              })
+              .catch((error) => {
+                console.error('Error al actualizar el producto:', error);
+              });
           })
           .catch((error) => {
-            console.error('Error al actualizar el producto:', error);
+            console.error('Error al cargar la imagen:', error);
           });
       } else {
-        // Crear nuevo producto
-        axios
-          .post(`${API_URL}/producto`, product)
-          .then(() => {
-            getProductos();
-            getCategorias();
-            setProductDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto creado', life: 3000 });
+        uploadImage(selectedImage)
+          .then((imageUrl) => {
+            const newProduct = { ...product, imagen: imageUrl };
+
+            axios
+              .post(`${API_URL}/producto`, newProduct)
+              .then(() => {
+                getProductos();
+                getCategorias();
+                setProductDialog(false);
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto creado', life: 3000 });
+              })
+              .catch((error) => {
+                console.error('Error al crear el producto:', error);
+              });
           })
           .catch((error) => {
             console.error('Error al crear el producto:', error);
@@ -163,40 +201,6 @@ export default function Product() {
     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Producto Eliminado', life: 3000 });
   };
 
-  const uploadImage = (event) => {
-    const file = event.target.files[0];
-    const formData = new FormData();
-    formData.append('image', file);
-
-    // Hacer la petición para subir la imagen al servidor
-    axios
-      .post(`${API_URL}/imagen`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((response) => {
-        const imageUrl = response.data.imageUrl;
-        setProduct({ ...product, imagenId: imageUrl });
-      })
-      .catch((error) => {
-        console.error('Error al subir la imagen:', error);
-      });
-  };
-
-  const deleteImage = () => {
-    // Eliminar la imagen del servidor
-    axios
-      .delete(`${API_URL}/imagen/${product.imagenId}`)
-      .then(() => {
-        setProduct({ ...product, imagenId: null });
-        toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Imagen eliminada', life: 3000 });
-      })
-      .catch((error) => {
-        console.error('Error al eliminar la imagen:', error);
-      });
-  };
-
   const exportCSV = () => {
     dt.current.exportCSV();
   };
@@ -208,17 +212,16 @@ export default function Product() {
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(data, 'productos.xlsx');
   };
-
   const exportPDF = () => {
     const doc = new jsPDF();
     const columns = [
       { header: 'Nombre', dataKey: 'nombre' },
-      { header: 'Imagen', dataKey: 'imagenId' },
+      { header: 'Imagen', dataKey: 'imagen' },
       { header: 'Categoria', dataKey: 'categoria' },
     ];
     const rows = products.map((producto) => ({
       nombre: producto.nombre,
-      imagenId: producto.imagenId,
+      imagen: producto.imagen,
       categoria: producto.categoria.categoriaName
     }));
 
@@ -333,32 +336,13 @@ export default function Product() {
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos" globalFilter={globalFilter} header={header} emptyMessage="No se encontraron resultados">
           <Column selectionMode="multiple" exportable={false}></Column>
           <Column field="nombre" header="Nombre" sortable style={{ minWidth: '12rem' }}></Column>
-          <Column field="imagenId" header="Imagen" body={imageBodyTemplate}></Column>
+          <Column field="imagen" header="Imagen" body={imageBodyTemplate}></Column>
           <Column field="categoria.categoriaName" header="Categoria" sortable style={{ minWidth: '16rem' }}></Column>
           <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
         </DataTable>
       </div>
 
       <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header={modalTitle} modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-        <div className="p-field">
-          <label htmlFor="imagen">Imagen</label>
-          <div className="p-inputgroup">
-            <span className="p-inputgroup-addon">
-              <i className="pi pi-image" />
-            </span>
-            <input
-              id="imagen"
-              type="file"
-              onChange={uploadImage}
-            />
-          </div>
-        </div>
-        {product.imagenId && (
-          <div className="product-image-container">
-            <img src={`${API_URL}/imagen/${product.imagenId}`} alt="Imagen del producto" className="product-image" />
-            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-outlined" onClick={deleteImage} />
-          </div>
-        )}
         <div className="field">
           <label htmlFor="nombre" className="font-bold">
             Nombre
@@ -367,11 +351,18 @@ export default function Product() {
           {submitted && !product.nombre && <small className="p-error">El nombre es obligatorio.</small>}
         </div>
         <div className="field">
-          <label htmlFor="imagenId" className="font-bold">
-            Descripción
+          <label htmlFor="imagen" className="font-bold">
+            Imagen
           </label>
-          <InputText id="imagenId" value={product.imagenId} onChange={(e) => onInputChange(e, 'imagenId')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.imagenId })} />
-          {submitted && !product.imagenId && <small className="p-error">La imagen es obligatorio.</small>}
+          <InputText id="imagen" value={product.imagen} onChange={(e) => onInputChange(e, 'imagen')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.imagen })} />
+          {submitted && !product.imagen && <small className="p-error">La imagen es obligatorio.</small>}
+        </div>
+        <div className="field">
+          <label htmlFor="imagen" className="font-bold">
+            Subir Imagen
+          </label>
+          <input type="file" id="imagen" onChange={handleImageChange} />
+          {submitted && !product.imagen && <small className="p-error">La imagen es obligatoria.</small>}
         </div>
         <div className="field">
           <label className="mb-3 font-bold">Categoría</label>

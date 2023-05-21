@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -13,14 +14,18 @@ import {
   IonRow,
   IonTitle,
   IonToolbar,
+  IonTab,
+  IonLabel,
+  IonText,
+  IonRouterLink,
+  IonBadge,
 } from "@ionic/react";
 import { add, close, pencil } from "ionicons/icons";
-import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import Category from "./Category";
 import { removeCustomer, searchCustomers } from "./CategoryApi";
 
-const CategoryList: React.FC = (props: any) => {
+const CategoryList: React.FC = () => {
   const { name } = useParams<{ name: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const history = useHistory();
@@ -84,31 +89,44 @@ const CategoryList: React.FC = (props: any) => {
 
             <IonGrid className="table">
               <IonRow>
-                <IonCol>Nombre</IonCol>
-                <IonCol>Descripción</IonCol>
-                <IonCol>Acciones</IonCol>
+                <IonCol>
+                  <IonLabel>Nombre</IonLabel>
+                </IonCol>
+                <IonCol>
+                  <IonLabel>Estado</IonLabel>
+                </IonCol>
+                <IonCol>
+                  <IonLabel>Acciones</IonLabel>
+                </IonCol>
               </IonRow>
 
               {categories.map((category: Category) => (
-                <IonRow key={category.categoriaId}>
-                  <IonCol>{category.categoriaName}</IonCol>
-                  <IonCol>{category.categoriaDescription}</IonCol>
+                <IonRow key={category.id}>
                   <IonCol>
-                    <IonButton
+                    <IonText>{category.nombre}</IonText>
+                  </IonCol>
+                  <IonCol>
+                    <IonBadge
+                      color={
+                        category.estado === "activo" ? "success" : "danger"
+                      }
+                    >
+                      {category.estado}
+                    </IonBadge>
+                  </IonCol>
+                  <IonCol>
+                    <IonRouterLink
                       color="primary"
-                      fill="clear"
-                      onClick={() => editCustomer(String(category.categoriaId))}
+                      onClick={() => editCustomer(String(category.id))}
                     >
                       <IonIcon icon={pencil} slot="icon-only" />
-                    </IonButton>
-
-                    <IonButton
+                    </IonRouterLink>
+                    <IonRouterLink
                       color="danger"
-                      fill="clear"
-                      onClick={() => remove(String(category.categoriaId))}
+                      onClick={() => remove(String(category.id))}
                     >
                       <IonIcon icon={close} slot="icon-only" />
-                    </IonButton>
+                    </IonRouterLink>
                   </IonCol>
                 </IonRow>
               ))}
