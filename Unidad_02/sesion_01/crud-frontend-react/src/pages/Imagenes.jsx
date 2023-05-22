@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const Imagen = () => {
   const API_URL = "http://localhost:9090";
@@ -17,7 +17,7 @@ const Imagen = () => {
 
   const getImagenes = () => {
     axios
-    .get(`${API_URL}/imagen`)
+      .get(`${API_URL}/imagen`)
       .then((response) => {
         setImagenes(response.data);
       })
@@ -25,7 +25,7 @@ const Imagen = () => {
         console.log(error);
         // Manejar el error apropiadamente (mostrar mensaje de error, etc.)
       });
-  }
+  };
 
   const editarProducto = (id) => {
     const producto = imagenes.find((p) => p.id === id);
@@ -35,7 +35,7 @@ const Imagen = () => {
       url: producto.url,
     });
     setModalIsOpen(true);
-  }
+  };
 
   const eliminarProducto = (id) => {
     axios
@@ -47,21 +47,26 @@ const Imagen = () => {
         console.log(error);
         // Manejar el error apropiadamente (mostrar mensaje de error, etc.)
       });
-  }
+  };
 
   return (
     <div>
       <div className="productos-container">
         <div className="productos-title">Lista de Imágenes</div>
         <div className="btn_nuevo">
-          <button className="nuevo-btn" onClick={() => {
-            setProductoEditado({
-              id: null,
-              type: "",
-              url: "",
-            });
-            setModalIsOpen(true);
-          }}>Nuevo</button>
+          <button
+            className="nuevo-btn"
+            onClick={() => {
+              setProductoEditado({
+                id: null,
+                type: "",
+                url: "",
+              });
+              setModalIsOpen(true);
+            }}
+          >
+            Nuevo
+          </button>
         </div>
         <div className="encabezado-list">
           <p className="encabezado-title">Tipo</p>
@@ -73,18 +78,25 @@ const Imagen = () => {
             <div className="productos-list" key={imagen.id}>
               <h1 className="producto-name">{imagen.type}</h1>
               <div>
-              <img
-    style={{ width: '23rem' }}
-    src={imagen.url}
-    alt={imagen.type}
-  />
+                <img
+                  style={{ width: "4rem" }}
+                  src={imagen.url}
+                  alt={imagen.type}
+                />
               </div>
               <div className="btn-editar-eliminar">
-                <button className="editar-btn"
+                <button
+                  className="editar-btn"
                   onClick={() => editarProducto(imagen.id)}
-                >Editar</button>
-                <button className="eliminar-btn"
-                  onClick={() => eliminarProducto(imagen.id)}>Eliminar</button>
+                >
+                  Editar
+                </button>
+                <button
+                  className="eliminar-btn"
+                  onClick={() => eliminarProducto(imagen.id)}
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
