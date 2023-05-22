@@ -15,8 +15,8 @@ const Imagen = () => {
     getImagenes();
   }, []);
 
-  const getImagenes = async () => {
-    await axios
+  const getImagenes = () => {
+    axios
     .get(`${API_URL}/imagen`)
       .then((response) => {
         setImagenes(response.data);
@@ -75,7 +75,7 @@ const Imagen = () => {
               <div>
               <img
     style={{ width: '23rem' }}
-    src={`${imagen.url}`}
+    src={imagen.url}
     alt={imagen.type}
   />
               </div>
