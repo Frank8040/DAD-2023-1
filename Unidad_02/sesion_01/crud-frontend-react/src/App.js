@@ -128,9 +128,22 @@ const Listado = () => {
       });
   };
 
-  const editarDato = (id) => {
+  const actualizarDato = (id, newData) => {
+    axios
+      .put(`http://localhost:9090/imagen/${id}`, newData)
+      .then((response) => {
+        console.log(response.data);
+        // Realizar cualquier acción adicional después de la actualización exitosa
+      })
+      .catch((error) => {
+        console.error(error);
+        // Manejar errores de la solicitud
+      });
+  };
+
+  const editarDato = (id, newData) => {
     console.log(`Editar dato con ID ${id}`);
-    openDialog();
+    actualizarDato(id, newData);
     // Implementa la lógica adicional para editar el dato con el ID proporcionado
   };
 
