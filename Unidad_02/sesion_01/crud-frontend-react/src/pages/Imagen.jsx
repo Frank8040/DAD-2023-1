@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import 'jspdf-autotable';
 import Table from '../components/Table';
 import { DialogCreateUpdate, DialogDelete } from '../components/Dialog';
-import { createCategory, deleteCategory, deleteSelectedCategories, getCategoryList, updateCategory } from '../services/CategoryService';
+import { createImage, deleteImage, deleteSelectedImages, getImageList, updateImage } from '../services/ImagenService';
 import { exportToExcel, exportToPdf } from '../export/ExportsUtils';
 
 export default function Image() {
@@ -15,14 +15,14 @@ export default function Image() {
   let dataImage = {
     id: null,
     type: "",
-    url: "",
+    file: null,
   };
 
-  const [categorias, setImages] = useState([]);
+  const [images, setImages] = useState([]);
   const [imageDialog, setImageDialog] = useState(false);
   const [deleteImageDialog, setDeleteImageDialog] = useState(false);
   const [deleteImagesDialog, setDeleteImagesDialog] = useState(false);
-  const [categoria, setImage] = useState(dataImage);
+  const [image, setImage] = useState(dataImage);
   const [selectedImages, setSelectedImages] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
@@ -32,11 +32,11 @@ export default function Image() {
   const dt = useRef(null);
 
   useEffect(() => {
-    getCategories();
+    getImages();
   }, []);
 
-  const getCategories = () => {
-    getCategoryList()
+  const getImages = () => {
+    getImageList()
       .then((response) => {
         setImages(response.data);
       })
@@ -45,80 +45,95 @@ export default function Image() {
       });
   };
 
-  const saveUpdate = () => {
+  const onInputChange = (event) => {
+    const { name_01, value_01 } = event.target;
+    setImage({ ...image, [name_01]: value_01 });
+  };
+
+  const onFileSelect = (event) => {
+    const file = event.target.files[0];
+    setImage({ ...image, file });
+  };
+
+  const saveUpdate = (event) => {
     setSubmitted(true);
 
-    if (categoria.type && categoria.url) {
-      if (categoria.id || isCreating === false) {
-        updateCategory(categoria)
+    if (image.type) {
+      if (image.id || isCreating === false) {
+        updateImage(image)
           .then(() => {
-            getCategories();
+            getImages();
             setImageDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría actualizado', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Imagen actualizado', life: 3000 });
           })
           .catch((error) => {
-            console.error('Error al actualizar el categoria:', error);
+            console.error('Error al actualizar la imagen:', error);
           });
       } else {
-        createCategory(categoria)
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append("type", image.type);
+        formData.append("file", image.file);
+        createImage(formData)
           .then(() => {
-            getCategories();
+            getImages();
             setImageDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría creado', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Imagen creado', life: 3000 });
           })
           .catch((error) => {
-            console.error('Error al crear el categoría', error)
-            console.log('Error al crear el categoría:', error);
+            console.error('Error al crear la imagen', error)
+            console.log('Error al crear la imagen:', error);
           });
       }
     }
   };
 
-  const deleteImage = () => {
-    deleteCategory(categoria.id)
+  const removeImage = () => {
+    deleteImage(image.id)
       .then(() => {
-        getCategories();
+        getImages();
       })
       .catch((error) => {
         console.log(error);
       });
     setDeleteImageDialog(false);
-    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Categoría Eliminado', life: 3000 });
+    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Imagen Eliminado', life: 3000 });
   };
 
-  const deleteSelectedImages = () => {
-    const ids = selectedImages.map((categoria) => categoria.id);
-    deleteSelectedCategories(ids)
+  const removeSelectedImages = () => {
+    const ids = selectedImages.map((image) => image.id);
+    deleteSelectedImages(ids)
       .then(() => {
         setImages((prevCategorias) => prevCategorias.filter((c) => !ids.includes(c.id)));
         setSelectedImages(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Categorías Eliminadas', life: 3000 });
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Imágenes Eliminados', life: 3000 });
       })
       .catch((error) => {
-        console.error('Error al eliminar las categorías:', error);
+        console.error('Error al eliminar las imágenes:', error);
       });
     setDeleteImagesDialog(false);
-    getCategories();
+    getImages();
   };
 
   const openNew = () => {
     setImage(dataImage);
     setSubmitted(false);
     setImageDialog(true);
-    setModalTitle("Crear Categoria");
+    setModalTitle("Crear Imagen");
     setIsCreating(true);
   };
 
-  const editImage = (categoria) => {
-    setImage({ ...categoria });
+  const editImage = (image) => {
+    setImage({ ...image });
     setSubmitted(false);
     setImageDialog(true);
-    setModalTitle("Editar categoria");
+    setModalTitle("Editar Imagen");
     setIsCreating(false);
   };
 
-  const confirmDeleteImage = (categoria) => {
-    setImage(categoria);
+  const confirmDeleteImage = (image) => {
+    setImage(image);
     setDeleteImageDialog(true);
   };
 
@@ -140,24 +155,15 @@ export default function Image() {
   };
 
   const exportExcel = () => {
-    exportToExcel(categorias);
+    exportToExcel(images);
   };
 
   const exportPDF = () => {
-    exportToPdf(categorias);
+    exportToPdf(images);
   };
 
   const confirmDeleteSelected = () => {
     setDeleteImagesDialog(true);
-  };
-
-  const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || '';
-    let _categoria = { ...categoria };
-
-    _categoria[`${name}`] = val;
-
-    setImage(_categoria);
   };
 
   const leftToolbarTemplate = () => {
@@ -191,9 +197,19 @@ export default function Image() {
     );
   };
 
+  const imageBodyTemplate = (rowData) => {
+    return (
+      <img
+        src={rowData.url}
+        alt={rowData.type}
+        className="shadow-2 border-round" style={{ width: '64px' }}
+      />
+    );
+  };
+
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h4 className="m-0">Administrar Categorías</h4>
+      <h4 className="m-0">Administrar Imágenes</h4>
       <span className="p-input-icon-left">
         <i className="pi pi-search" />
         <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
@@ -209,43 +225,45 @@ export default function Image() {
   const deleteImageDialogFooter = (
     <React.Fragment>
       <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteImageDialog} />
-      <Button label="Sí" icon="pi pi-check" severity="danger" onClick={deleteImage} />
+      <Button label="Sí" icon="pi pi-check" severity="danger" onClick={removeImage} />
     </React.Fragment>
   );
   const deleteImagesDialogFooter = (
     <React.Fragment>
       <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteImagesDialog} />
-      <Button label="Sí" icon="pi pi-check" severity="danger" onClick={deleteSelectedImages} />
+      <Button label="Sí" icon="pi pi-check" severity="danger" onClick={removeSelectedImages} />
     </React.Fragment>
   );
 
   return (
     <div>
       {/** TABLA de la categoría */}
-      <Table refToast={toast} left={leftToolbarTemplate} right={rightToolbarTemplate} refDT={dt} value={categorias}
-        selection={selectedImages} onSelectionChange={(e) => setSelectedImages(e.value)} dataKey="categoriaId"
-        globalFilter={globalFilter} header={header} nombre_01="type" header_01="Nombre"
-        nombre_02="url" header_02="Descripción" body={actionBodyTemplate} />
+      <Table isCategory={true} refToast={toast} left={leftToolbarTemplate} right={rightToolbarTemplate} refDT={dt} value={images}
+        selection={selectedImages} onSelectionChange={(e) => setSelectedImages(e.value)} dataKey="id"
+        globalFilter={globalFilter} header={header} nombre_00="type" header_00="Tipo"
+        fieldImage="url" headerImage="Imagen" bodyImage={imageBodyTemplate} body={actionBodyTemplate} />
+
       {/** Modal de CREAR y ACTUALIZAR */}
       <DialogCreateUpdate visible={imageDialog} header={modalTitle} footer={imageDialogFooter}
-        onHide={hideDialog} htmlFor_01="type" label_01="Nombre" id_01="type"
-        value_01={categoria.type} onChange_01={(e) => onInputChange(e, 'type')}
-        className_01={classNames({ 'p-invalid': submitted && !categoria.type })} msgRequired_01={submitted
-          && !categoria.type && <small className="p-error">El nombre es obligatorio.</small>}
-        htmlFor_02="url" label_02="Descripción" id_02="url"
-        value_02={categoria.url} onChange_02={(e) => onInputChange(e, 'url')}
-        className_02={classNames({ 'p-invalid': submitted && !categoria.url })}
-        msgRequired_02={submitted && !categoria.url && <small className="p-error">La descripción es
-          obligatorio.</small>} />
-      {/** Modal de ELIMINAR una categoría */}
+        onHide={hideDialog} htmlFor_01="type" label_01="Tipo" id_01="type"
+        value_01={image.type} onChange_01={onInputChange}
+        className_01={classNames({ 'p-invalid': submitted && !image.type })} msgRequired_01={submitted
+          && !image.type && <small className="p-error">El tipo es obligatorio.</small>} type_01="text" name_01="type"
+        htmlFor_02="url" label_02="Imagen" id_02="url"
+        value_02={image.url} onChange_02={onFileSelect}
+        className_02={classNames({ 'p-invalid': submitted && !image.url })} msgRequired_02={submitted
+          && !image.url && <small className="p-error">La imagen obligatorio.</small>} type_02="file" name_02="url"
+        isCategory={false}
+      />
+      {/** Modal de ELIMINAR un IMAGEN */}
       <DialogDelete visible={deleteImageDialog} footer={deleteImageDialogFooter}
-        onHide={hideDeleteImageDialog} msgDialogModal={categoria && (<span>
-          Are you sure you want to delete <b>{categoria.nombre}</b>?
+        onHide={hideDeleteImageDialog} msgDialogModal={image && (<span>
+          Are you sure you want to delete <b>{image.type}</b>?
         </span>
         )} />
-      {/** Modal de ELIMINAR varias categorias */}
+      {/** Modal de ELIMINAR varias IMÁGENES */}
       <DialogDelete visible={deleteImagesDialog} footer={deleteImagesDialogFooter}
-        onHide={hideDeleteImagesDialog} msgDialogModal={categoria && <span>Are you sure you want to
+        onHide={hideDeleteImagesDialog} msgDialogModal={image && <span>Are you sure you want to
           delete the selected categories?</span>} />
     </div>
   );

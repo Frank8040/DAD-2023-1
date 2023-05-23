@@ -20,8 +20,6 @@ export const deleteImage = (id) => {
 };
 
 export const deleteSelectedImages = (ids) => {
-  const deleteRequests = ids.map((id) =>
-    deleteCategory(id)
-  );
+  const deleteRequests = ids.map((id) => deleteImage(id));
   return Promise.all(deleteRequests);
 };
