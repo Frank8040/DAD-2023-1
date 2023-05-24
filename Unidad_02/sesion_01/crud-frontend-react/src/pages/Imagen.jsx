@@ -64,6 +64,7 @@ export default function Image() {
       ...prevImage,
       file,
       preview,
+      fileName: file ? file.name : prevImage.fileName, // Actualizar el nombre del archivo
     }));
   };
 
