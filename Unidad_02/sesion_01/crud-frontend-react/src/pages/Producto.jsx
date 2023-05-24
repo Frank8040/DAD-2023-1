@@ -23,7 +23,9 @@ export default function Product() {
   let datosProduct = {
     id: null,
     nombre: "",
-    imagen: "",
+    file: null,
+    preview: null,
+    fileName: "",
     categoria: {
       categoriaId: "",
     }
@@ -37,6 +39,8 @@ export default function Product() {
   const [product, setProduct] = useState(datosProduct);
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedImages, setSelectedImages] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [modalTitle, setModalTitle] = useState("");
@@ -49,9 +53,38 @@ export default function Product() {
     getCategorias();
   }, []);
 
-  const handleImageChange = (event) => {
+  /*const handleImageChange = (event) => {
     const file = event.target.files[0];
     setSelectedImage(file);
+
+    const onInputChange = (e, name) => {
+    const val = (e.target && e.target.value) || '';
+    let _product = { ...product };
+
+    _product[`${name}`] = val;
+
+    setProduct(_product);
+  };
+  };*/
+
+  const onInputChange = (e, name) => {
+    const val = e.target.value || '';
+    setProduct((prevImage) => ({
+      ...prevImage,
+      [name]: val,
+    }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    const preview = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setProduct((prevImage) => ({
+      ...prevImage,
+      file,
+      preview,
+      fileName: file ? file.name : prevImage.fileName, // Actualizar el nombre del archivo
+    }));
   };
 
   const getProductos = () => {
@@ -105,74 +138,76 @@ export default function Product() {
     return <img src={rowData.imagen} alt="Product" className="shadow-2 border-round" style={{ width: '64px' }} />;
   };
 
-  const uploadImage = (imageFile) => {
-    return new Promise((resolve, reject) => {
-      const formData = new FormData();
-      formData.append('imageUrl', imageFile);
-
-      axios
-        .post(`${API_URL}/imagen`, formData)
-        .then((response) => {
-          resolve(response.data.imageUrl);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  };
-
-  const saveUpdate = () => {
+  const saveUpdate = (event) => {
+    event.preventDefault();
     setSubmitted(true);
 
-    if (product.nombre && product.imagen && product.categoria.categoriaId) {
+    if (product.nombre) {
+      if (product.id || isCreating === false) {
+        const formData = new FormData();
+        let hasChanges = false;
 
-      if (product.id || isCreating || selectedImage) { // Corrección en esta línea
-        // Actualizar producto existente
-        uploadImage(selectedImage)
-          .then((imageUrl) => {
-            const updatedProduct = { ...product, imagen: imageUrl };
+        // Verificar si hay cambios en la propiedad 'type'
+        const originalProduct = products.find((img) => img.id === product.id);
+        if (product.nombre !== originalProduct?.nombre) {
+          formData.append("nombre", product.nombre);
+          hasChanges = true;
+        }
 
+        // Verificar si hay cambios en la propiedad 'categoria'
+        const originalCategory = products.find((img) => img.id === product.id);
+        if (product.categoria.categoriaId !== originalCategory?.categoria.categoriaId) {
+          formData.append("categoria", product.categoria.categoriaId);
+          hasChanges = true;
+        }
+
+        // Verificar si hay cambios en el archivo seleccionado
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+          hasChanges = true;
+        }
+
+          if (hasChanges) {
             axios
-              .put(`${API_URL}/producto`, updatedProduct)
-              .then((response) => {
+            .put(`${API_URL}/producto/imagen/${product.id}`, formData)
+              .then(() => {
                 getProductos();
                 getCategorias();
                 setProductDialog(false);
                 toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto actualizado', life: 3000 });
               })
               .catch((error) => {
-                console.error('Error al actualizar el producto:', error);
+                console.error("Error al actualizar el producto:", error);
               });
-          })
-          .catch((error) => {
-            console.error('Error al cargar la imagen:', error);
-          });
+          } else {
+            // No hay cambios, simplemente cierra el diálogo
+            setProductDialog(false);
+          }
       } else {
-        uploadImage(selectedImage)
-          .then((imageUrl) => {
-            const newProduct = { ...product, imagen: imageUrl };
-
-            axios
-              .post(`${API_URL}/producto`, newProduct)
-              .then(() => {
-                getProductos();
-                getCategorias();
-                setProductDialog(false);
+        const formData = new FormData();
+        formData.append("nombre", product.nombre);
+        formData.append("categoria", product.categoria.categoriaId);
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+        }
+        axios
+        .post(`${API_URL}/producto`, formData)
+          .then(() => {
+            getProductos();
+            getCategorias();
+            setProductDialog(false);
                 toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto creado', life: 3000 });
-              })
-              .catch((error) => {
-                console.error('Error al crear el producto:', error);
-              });
           })
           .catch((error) => {
-            console.error('Error al crear el producto:', error);
+            console.error("Error al crear el producto:", error);
           });
       }
     }
   };
 
   const editProducto = (product) => {
-    setProduct({ ...product });
+    setProduct({ ...product, id: product.id, preview: product.imagen, fileName: product.file ? product.file.name : product.imagen });
+    setSelectedFile(null);
     setSubmitted(false);
     setProductDialog(true);
     setModalTitle("Editar Producto");
@@ -185,7 +220,7 @@ export default function Product() {
   };
 
   const deleteProduct = () => {
-    // Eliminar imagen de la lista actual
+    // Eliminar producto de la lista actual
     setProducts((prevProducts) => prevProducts.filter((c) => c.id !== product.id));
     // Aquí se hace la petición a la API para eliminar el categoria
     axios
@@ -260,15 +295,6 @@ export default function Product() {
     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Categoría Eliminado', life: 3000 });
   };
 
-  const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || '';
-    let _product = { ...product };
-
-    _product[`${name}`] = val;
-
-    setProduct(_product);
-  };
-
   const leftToolbarTemplate = () => {
     return (
       <div className="flex flex-wrap gap-2">
@@ -325,6 +351,12 @@ export default function Product() {
     </React.Fragment>
   );
 
+  const fileInputRef = React.createRef();
+
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div>
       <Toast ref={toast} />
@@ -351,19 +383,38 @@ export default function Product() {
           {submitted && !product.nombre && <small className="p-error">El nombre es obligatorio.</small>}
         </div>
         <div className="field">
-          <label htmlFor="imagen" className="font-bold">
-            Imagen
-          </label>
-          <InputText id="imagen" value={product.imagen} onChange={(e) => onInputChange(e, 'imagen')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.imagen })} />
-          {submitted && !product.imagen && <small className="p-error">La imagen es obligatorio.</small>}
+        <div className="p-field">
+          <label htmlFor="file">Imagen:</label>
+          <div className="p-inputgroup">
+            <input
+              ref={fileInputRef}
+              accept="image/*"
+              type="file"
+              className="p-inputtext"
+              style={{ display: "none" }}
+              onChange={handleImageChange}
+            />
+            <Button
+              type="button"
+              icon="pi pi-upload"
+              label="Seleccionar"
+              onClick={handleClick}
+            />
+            <InputText
+              readOnly
+              value={product.fileName}
+              placeholder="Seleccionar archivo"
+            />
+          </div>
+          {product.preview && (
+          <img
+            src={product.preview}
+            alt="Vista previa"
+            style={{ marginTop: "10px", maxWidth: "200px" }}
+          />
+        )}
         </div>
-        <div className="field">
-          <label htmlFor="imagen" className="font-bold">
-            Subir Imagen
-          </label>
-          <input type="file" id="imagen" onChange={handleImageChange} />
-          {submitted && !product.imagen && <small className="p-error">La imagen es obligatoria.</small>}
-        </div>
+      </div>
         <div className="field">
           <label className="mb-3 font-bold">Categoría</label>
           <div className="formgrid grid">

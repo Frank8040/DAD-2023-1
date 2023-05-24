@@ -17,7 +17,7 @@ export default function Image() {
     type: "",
     file: null,
     preview: null,
-    fileName: "", // Agrega esta línea
+    fileName: "",
   };
 
   const [images, setImages] = useState([]);

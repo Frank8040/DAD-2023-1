@@ -5,17 +5,17 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 // Exporta los datos a un archivo PDF
-export const exportToPdf = (categorias) => {
+export const exportToPdf = (images) => {
     const doc = new jsPDF();
     const columns = [
-        { header: "Id", dataKey: "categoriaId" },
-        { header: "Nombre", dataKey: "categoriaName" },
-        { header: "Descripción", dataKey: "categoriaDescription" },
+        { header: "Id", dataKey: "id" },
+        { header: "Tipo", dataKey: "type" },
+        { header: "Imagen", dataKey: "url" },
     ];
-    const rows = categorias.map((categoria) => ({
-        categoriaId: categoria.categoriaId,
-        categoriaName: categoria.categoriaName,
-        categoriaDescription: categoria.categoriaDescription,
+    const rows = images.map((categoria) => ({
+        id: categoria.id,
+        type: categoria.type,
+        url: categoria.url,
     }));
 
     doc.autoTable({
@@ -23,7 +23,7 @@ export const exportToPdf = (categorias) => {
         body: rows,
         startY: 10,
     });
-    doc.save("categorias.pdf");
+    doc.save("imagenes.pdf");
 };
 
 // Exporta los datos a un archivo Excel (XLSX)
