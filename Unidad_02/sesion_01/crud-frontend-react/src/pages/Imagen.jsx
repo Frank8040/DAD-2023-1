@@ -6,16 +6,18 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import 'jspdf-autotable';
 import Table from '../components/Table';
-import { DialogCreateUpdate, DialogDelete } from '../components/Dialog';
+import { DialogDelete } from '../components/Dialog';
 import { createImage, deleteImage, deleteSelectedImages, getImageList, updateImage } from '../services/ImagenService';
 import { exportToExcel, exportToPdf } from '../export/ExportsUtils';
+import { DialogCreateUpdateImage } from '../components/DialogImage';
 
 export default function Image() {
 
   let dataImage = {
-    id: null,
     type: "",
     file: null,
+    preview: null,
+    fileName: "", // Agrega esta línea
   };
 
   const [images, setImages] = useState([]);
@@ -23,6 +25,7 @@ export default function Image() {
   const [deleteImageDialog, setDeleteImageDialog] = useState(false);
   const [deleteImagesDialog, setDeleteImagesDialog] = useState(false);
   const [image, setImage] = useState(dataImage);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [selectedImages, setSelectedImages] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
@@ -45,48 +48,105 @@ export default function Image() {
       });
   };
 
-  const onInputChange = (event) => {
-    const { name_01, value_01 } = event.target;
-    setImage({ ...image, [name_01]: value_01 });
+  const onInputChange = (e, name) => {
+    const val = e.target.value || '';
+    setImage((prevImage) => ({
+      ...prevImage,
+      [name]: val,
+    }));
   };
 
-  const onFileSelect = (event) => {
+  const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setImage({ ...image, file });
+    const preview = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setImage((prevImage) => ({
+      ...prevImage,
+      file,
+      preview,
+    }));
   };
 
   const saveUpdate = (event) => {
+    event.preventDefault();
     setSubmitted(true);
 
     if (image.type) {
       if (image.id || isCreating === false) {
-        updateImage(image)
-          .then(() => {
-            getImages();
-            setImageDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Imagen actualizado', life: 3000 });
-          })
-          .catch((error) => {
-            console.error('Error al actualizar la imagen:', error);
-          });
-      } else {
-        event.preventDefault();
+        const formData = new FormData();
+        let hasChanges = false;
 
+        // Verificar si hay cambios en la propiedad 'type'
+        const originalImage = images.find((img) => img.id === image.id);
+        if (image.type !== originalImage?.type) {
+          formData.append("type", image.type);
+          hasChanges = true;
+        }
+
+        // Verificar si hay cambios en el archivo seleccionado
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+          hasChanges = true;
+        }
+
+        if (hasChanges) {
+          updateImage(image.id, formData)
+            .then(() => {
+              getImages();
+              setImageDialog(false);
+              toast.current.show({
+                severity: "success",
+                summary: "Éxito",
+                detail: "Imagen actualizada",
+                life: 3000,
+              });
+            })
+            .catch((error) => {
+              console.error("Error al actualizar la imagen:", error);
+            });
+        } else {
+          // No hay cambios, simplemente cierra el diálogo
+          setImageDialog(false);
+        }
+      } else {
         const formData = new FormData();
         formData.append("type", image.type);
-        formData.append("file", image.file);
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+        }
+
         createImage(formData)
           .then(() => {
             getImages();
             setImageDialog(false);
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Imagen creado', life: 3000 });
+            toast.current.show({
+              severity: "success",
+              summary: "Éxito",
+              detail: "Imagen creado",
+              life: 3000,
+            });
           })
           .catch((error) => {
-            console.error('Error al crear la imagen', error)
-            console.log('Error al crear la imagen:', error);
+            console.error("Error al crear la imagen:", error);
           });
       }
     }
+  };
+
+  const openNew = () => {
+    setImage(dataImage);
+    setSubmitted(false);
+    setImageDialog(true);
+    setModalTitle("Crear Imagen");
+    setIsCreating(true);
+  };
+
+  const editImage = (image) => {
+    setImage({ ...image, id: image.id, preview: image.url, fileName: image.file ? image.file.name : image.url });
+    setSelectedFile(null);
+    setModalTitle('Editar Imagen');
+    setIsCreating(false);
+    setImageDialog(true);
   };
 
   const removeImage = () => {
@@ -105,6 +165,7 @@ export default function Image() {
     const ids = selectedImages.map((image) => image.id);
     deleteSelectedImages(ids)
       .then(() => {
+        getImages();
         setImages((prevCategorias) => prevCategorias.filter((c) => !ids.includes(c.id)));
         setSelectedImages(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Imágenes Eliminados', life: 3000 });
@@ -114,22 +175,6 @@ export default function Image() {
       });
     setDeleteImagesDialog(false);
     getImages();
-  };
-
-  const openNew = () => {
-    setImage(dataImage);
-    setSubmitted(false);
-    setImageDialog(true);
-    setModalTitle("Crear Imagen");
-    setIsCreating(true);
-  };
-
-  const editImage = (image) => {
-    setImage({ ...image });
-    setSubmitted(false);
-    setImageDialog(true);
-    setModalTitle("Editar Imagen");
-    setIsCreating(false);
   };
 
   const confirmDeleteImage = (image) => {
@@ -244,15 +289,19 @@ export default function Image() {
         fieldImage="url" headerImage="Imagen" bodyImage={imageBodyTemplate} body={actionBodyTemplate} />
 
       {/** Modal de CREAR y ACTUALIZAR */}
-      <DialogCreateUpdate visible={imageDialog} header={modalTitle} footer={imageDialogFooter}
+      <DialogCreateUpdateImage visible={imageDialog} header={modalTitle} footer={imageDialogFooter}
         onHide={hideDialog} htmlFor_01="type" label_01="Tipo" id_01="type"
-        value_01={image.type} onChange_01={onInputChange}
+        value_01={image.type} onChange_01={(e) => onInputChange(e, 'type')}
         className_01={classNames({ 'p-invalid': submitted && !image.type })} msgRequired_01={submitted
           && !image.type && <small className="p-error">El tipo es obligatorio.</small>} type_01="text" name_01="type"
-        htmlFor_02="url" label_02="Imagen" id_02="url"
-        value_02={image.url} onChange_02={onFileSelect}
-        className_02={classNames({ 'p-invalid': submitted && !image.url })} msgRequired_02={submitted
-          && !image.url && <small className="p-error">La imagen obligatorio.</small>} type_02="file" name_02="url"
+        onChangeFile={handleFileChange} value_02={image.fileName}
+        imagen={image.preview && (
+          <img
+            src={image.preview}
+            alt="Vista previa"
+            style={{ marginTop: "10px", maxWidth: "200px" }}
+          />
+        )}
         isCategory={false}
       />
       {/** Modal de ELIMINAR un IMAGEN */}

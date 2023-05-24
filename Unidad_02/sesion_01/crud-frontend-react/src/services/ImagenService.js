@@ -6,12 +6,16 @@ export const getImageList = () => {
   return axios.get(API_URL);
 };
 
+export const getImage = (imageId) => {
+  return axios.get(`${API_URL}/${imageId}`); // Reemplaza la URL de la API con la correcta
+};
+
 export const createImage = (image) => {
   return axios.post(API_URL, image);
 };
 
-export const updateImage = (image) => {
-  return axios.put(API_URL, image);
+export const updateImage = (id, image) => {
+  return axios.put(`http://localhost:9090/imagen/imagen/${id}`, image);
 };
 
 export const deleteImage = (id) => {

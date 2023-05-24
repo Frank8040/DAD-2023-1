@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 
 export const DialogCreateUpdate = (props) => {
-  const { visible, header, footer, onHide, htmlFor_01, label_01, id_01, value_01, onChange_01, className_01, msgRequired_01, type_01,name_01,htmlFor_02, label_02, id_02, value_02, onChange_02, className_02, msgRequired_02, type_02 , name_02} = props;
+  const { visible, header, footer, onHide, htmlFor_01, label_01, id_01, value_01, onChange_01, className_01, msgRequired_01, type_01, name_01, htmlFor_02, label_02, id_02, value_02, onChange_02, className_02, msgRequired_02, type_02, name_02 } = props;
 
   const inputs = [{
     input: htmlFor_01, label: label_01, id: id_01, value: value_01, onChange: onChange_01, autoFocus: 'autoFocus', className: className_01, msgRequired: msgRequired_01, type: type_01, name: name_01
