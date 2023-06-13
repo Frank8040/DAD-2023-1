@@ -14,14 +14,14 @@ export const updateCategory = (categoria) => {
   return axios.put(API_URL, categoria);
 };
 
-export const deleteCategory = (categoriaId) => {
-  const url = `${API_URL}/${categoriaId}`;
+export const deleteCategory = (id) => {
+  const url = `${API_URL}/${id}`;
   return axios.delete(url);
 };
 
 export const deleteSelectedCategories = (categoriaIds) => {
-  const deleteRequests = categoriaIds.map((categoriaId) =>
-    deleteCategory(categoriaId)
+  const deleteRequests = categoriaIds.map((id) =>
+    deleteCategory(id)
   );
   return Promise.all(deleteRequests);
 };

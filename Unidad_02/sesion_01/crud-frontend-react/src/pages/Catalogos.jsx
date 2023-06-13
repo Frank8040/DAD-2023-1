@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Input from "../components/Input";
 
-import Modal from 'react-modal';
+import Modal from "react-modal";
 
 const Catalogos = () => {
   const API_URL = "http://localhost:9090";
@@ -26,7 +26,7 @@ const Catalogos = () => {
         // handle error
         console.log(error);
       });
-  }
+  };
 
   const editarProducto = (id) => {
     const producto = productos.find((p) => p.categoriaId === id);
@@ -35,8 +35,8 @@ const Catalogos = () => {
       categoriaName: producto.categoriaName,
       categoriaDescription: producto.categoriaDescription,
     });
-    setModalIsOpen(true)
-  }
+    setModalIsOpen(true);
+  };
 
   const crearProducto = (event) => {
     event.preventDefault();
@@ -49,12 +49,12 @@ const Catalogos = () => {
           categoriaDescription: "",
         });
         getCategorias();
-        setModalIsOpen(false)
+        setModalIsOpen(false);
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   const actualizarProducto = (event) => {
     event.preventDefault();
@@ -67,12 +67,12 @@ const Catalogos = () => {
           categoriaDescription: "",
         });
         getCategorias();
-        setModalIsOpen(false)
+        setModalIsOpen(false);
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   const eliminarProducto = (id) => {
     axios
@@ -83,7 +83,7 @@ const Catalogos = () => {
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   useEffect(() => {
     getCategorias();
@@ -91,9 +91,19 @@ const Catalogos = () => {
 
   const contenidoModal = (
     <div className="form-container">
-      <h2 className="form-title">{productoEditado.categoriaId ? 'Editar Producto' : 'Crear Producto'}</h2>
-      <Button className="cerrar-modal" onClick={() => setModalIsOpen(false)} title="X" />
-      <form onSubmit={productoEditado.categoriaId ? actualizarProducto : crearProducto}>
+      <h2 className="form-title">
+        {productoEditado.categoriaId ? "Editar Producto" : "Crear Producto"}
+      </h2>
+      <Button
+        className="cerrar-modal"
+        onClick={() => setModalIsOpen(false)}
+        title="X"
+      />
+      <form
+        onSubmit={
+          productoEditado.categoriaId ? actualizarProducto : crearProducto
+        }
+      >
         <div className="form-campos">
           <div className="form-input">
             <Input
@@ -122,9 +132,17 @@ const Catalogos = () => {
         </div>
         <div className="btn-actualizar-crear">
           {productoEditado.categoriaId ? (
-            <Button onClick={actualizarProducto} className="actualizar-btn" title="Actualizar" />
+            <Button
+              onClick={actualizarProducto}
+              className="actualizar-btn"
+              title="Actualizar"
+            />
           ) : (
-            <Button onClick={crearProducto} className="crear-btn" title="Crear Producto" />
+            <Button
+              onClick={crearProducto}
+              className="crear-btn"
+              title="Crear Producto"
+            />
           )}
         </div>
       </form>
@@ -135,22 +153,30 @@ const Catalogos = () => {
     <div className="productos-container">
       <div className="productos-title">Lista de Categorías</div>
       <div className="btn_nuevo">
-        <Button className="nuevo-btn" onClick={() => {
-          setProductoEditado({
-            categoriaId: null,
-            categoriaName: "",
-            categoriaDescription: "",
-          });
-          setModalIsOpen(true);
-        }} title="Nuevo" />
+        <Button
+          className="nuevo-btn"
+          onClick={() => {
+            setProductoEditado({
+              categoriaId: null,
+              categoriaName: "",
+              categoriaDescription: "",
+            });
+            setModalIsOpen(true);
+          }}
+          title="Nuevo"
+        />
       </div>
-      <Modal className="modal" isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+      <Modal
+        className="modal"
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+      >
         {contenidoModal}
       </Modal>
       <div className="encabezado-list">
-        <p className="encabezado-title" >Nombre</p>
-        <p className="encabezado-title" >Descripción</p>
-        <p className="encabezado-title" >Opciones</p>
+        <p className="encabezado-title">Nombre</p>
+        <p className="encabezado-title">Descripción</p>
+        <p className="encabezado-title">Opciones</p>
       </div>
       <div className="container-List">
         {productos.map((categoria) => (
@@ -174,6 +200,6 @@ const Catalogos = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Catalogos;
