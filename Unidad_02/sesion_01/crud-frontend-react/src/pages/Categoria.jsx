@@ -15,7 +15,7 @@ import {
   getCategoryList,
   updateCategory,
 } from "../services/CategoriaService";
-import { exportToExcel, exportToPdf } from "../exports/ExportFileCat";
+import { exportToExcel, exportToPdf } from "../export/ExportFileCat";
 
 export default function Category() {
   let dataCategory = {
@@ -355,7 +355,7 @@ export default function Category() {
     <div>
       {/** TABLA de la categoría */}
       <Table
-        isCategory={true}
+        isCategory={false}
         refToast={toast}
         left={leftToolbarTemplate}
         right={rightToolbarTemplate}

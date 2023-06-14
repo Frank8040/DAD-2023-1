@@ -32,10 +32,10 @@ const Table = (props) => {
   ];
 
   if (!isCategory) {
-    const columnCounts = [1, 4, 9];
+    const columnCounts = [2, 4, 9];
     const maxColumns = Math.max(...columnCounts);
 
-    for (let i = 2; i <= maxColumns; i++) {
+    for (let i = 3; i <= maxColumns; i++) {
       const fieldName = props[`nombre_0${i}`];
       const headerName = props[`header_0${i}`];
 

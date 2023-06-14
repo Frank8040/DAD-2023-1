@@ -5,6 +5,7 @@ import Product from "./pages/Producto";
 
 //IMPORTACIONES DE AUTH
 import * as AuthService from "./services/auth.service";
+import Category from "./pages/Categoria";
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -64,7 +65,7 @@ const App = () => {
         </div>
         <Routes>
           <Route path="/login" element={<LoginUser />} />
-          <Route path="/product" element={<Product />} />
+          <Route path="/product" element={<Category />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>

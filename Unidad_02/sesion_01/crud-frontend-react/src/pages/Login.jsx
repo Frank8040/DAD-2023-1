@@ -21,7 +21,10 @@ const LoginUser = () => {
       // Procesar la respuesta del backend, por ejemplo, guardar el token en el almacenamiento local
       const token = response.data.token;
       console.log("Guardado exitoso");
-      console.log(token);
+      console.log("token",token);
+
+      // Almacenar el token en el almacenamiento local
+      localStorage.setItem("token", token);
 
       // Redirigir a la página principal o hacer alguna otra acción
       navigate("/product");
