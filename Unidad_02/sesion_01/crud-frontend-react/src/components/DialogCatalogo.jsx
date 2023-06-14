@@ -6,7 +6,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 
 export const DialogCreateUpdate = (props) => {
-  // eslint-disable-next-line react/prop-types
   const {
     width,
     classDrowp,
@@ -337,6 +336,19 @@ export const DialogCreateUpdate = (props) => {
               className={className_01}
             />
             {msgRequired_01}
+          </div>
+          <div className="field">
+            <label htmlFor={htmlFor_02} className="font-bold">
+              {label_02}
+            </label>
+            <InputText
+              id={id_02}
+              value={value_02}
+              onChange={onChange_02}
+              required
+              className={className_02}
+            />
+            {msgRequired_02}
           </div>
         </>
       )}

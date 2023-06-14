@@ -4,7 +4,6 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 
 const Table = (props) => {
-  // eslint-disable-next-line react/prop-types
   const {
     refToast,
     left,
@@ -35,7 +34,7 @@ const Table = (props) => {
     const columnCounts = [2, 4, 9];
     const maxColumns = Math.max(...columnCounts);
 
-    for (let i = 3; i <= maxColumns; i++) {
+    for (let i = 1; i <= maxColumns; i++) {
       const fieldName = props[`nombre_0${i}`];
       const headerName = props[`header_0${i}`];
 
@@ -70,7 +69,7 @@ const Table = (props) => {
           emptyMessage="No se encontraron resultados"
         >
           <Column selectionMode="multiple" exportable={false}></Column>
-          {isCategory === false && (
+          {isCategory && (
             <Column
               field={fieldImage}
               header={headerImage}

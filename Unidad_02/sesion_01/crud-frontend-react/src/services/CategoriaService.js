@@ -22,17 +22,29 @@ export const createCategory = (categoria) => {
 };
 
 export const updateCategory = (categoria) => {
-  return axios.put(API_URL, categoria);
+  return axios.put(API_URL, categoria, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const deleteCategory = (id) => {
   const url = `${API_URL}/${id}`;
-  return axios.delete(url);
+  return axios.delete(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const deleteSelectedCategories = (categoriaIds) => {
   const deleteRequests = categoriaIds.map((id) =>
     deleteCategory(id)
   );
-  return Promise.all(deleteRequests);
+  return Promise.all(deleteRequests, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
