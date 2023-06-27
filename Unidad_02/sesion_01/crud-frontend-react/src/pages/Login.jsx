@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const LoginUser = () => {
+const LoginUser = ({ onLogin }) => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -11,48 +11,36 @@ const LoginUser = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post("http://localhost:9090/auth/login", {
         userName: userName,
         password: password,
       });
-
       // Procesar la respuesta del backend, por ejemplo, guardar el token en el almacenamiento local
       const token = response.data.token;
       console.log("Guardado exitoso");
-      console.log("token",token);
-
+      console.log("token", token);
       // Almacenar el token en el almacenamiento local
       localStorage.setItem("token", token);
-
-      // Redirigir a la página principal o hacer alguna otra acción
-      navigate("/product");
+      navigate("/admin");
+      onLogin(); // Llamar a la función onLogin pasada como prop para indicar que se ha iniciado sesión
     } catch (error) {
       console.error(error);
-      // Mostrar un mensaje de error o realizar alguna otra acción
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post("http://localhost:9090/auth/create", {
         userName: userName,
         password: password,
       });
-
-      // Procesar la respuesta del backend, por ejemplo, mostrar un mensaje de éxito
       console.log("Registro exitoso");
       console.log(response);
-      // ...
-
-      // Cambiar al modo de inicio de sesión después del registro
       setRegisterMode(false);
     } catch (error) {
       console.error(error);
-      // Mostrar un mensaje de error o realizar alguna otra acción
     }
   };
 

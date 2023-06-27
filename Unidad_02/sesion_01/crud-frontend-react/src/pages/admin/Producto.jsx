@@ -6,11 +6,11 @@ import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import "jspdf-autotable";
-import Table from "../components/Table";
-import { DialogCreateUpdate, DialogDelete } from "../components/DialogCatalogo";
-import * as ProductoService from "../services/ProductoService";
-import { exportToExcel, exportToPdf } from "../export/ExportFilePro";
-import { getCategoryList } from "../services/CategoriaService";
+import Table from "../../components/Table";
+import { DialogCreateUpdate, DialogDelete } from "../../components/DialogCatalogo";
+import * as ProductoService from "../../services/ProductoService";
+import { exportToExcel, exportToPdf } from "../../export/ExportFilePro";
+import { getCategoryList } from "../../services/CategoriaService";
 
 export default function Product() {
   let dataProduct = {

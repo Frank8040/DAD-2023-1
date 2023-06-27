@@ -1,84 +1,50 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LoginUser from "./pages/Login";
-import Product from "./pages/Producto";
-
-//IMPORTACIONES DE AUTH
-import * as AuthService from "./services/auth.service";
-import Category from "./pages/Categoria";
+import { ClientNavbar } from "./components/NavBar";
+import Inicio from "./pages/client/Inicio";
+import Nosotros from "./pages/client/Nosotros";
+import Producto from "./pages/client/Producto";
+import Admin from "./pages/client/Admin";
+import { LogoutUser } from "./pages/Logout";
 
 const App = () => {
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
-  const [currentUser, setCurrentUser] = useState(undefined);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    const user = AuthService.getCurrentUser();
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
-    if (user) {
-      setCurrentUser(user);
-      setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
-    }
-  }, []);
-
-  const logout = () => {
-    AuthService.logout();
+  const handleLogout = () => {
+    setIsAuthenticated(false);
   };
 
   return (
-    <>
-      <BrowserRouter>
-        <div>
-          <nav className="navbar navbar-expand navbar-dark bg-dark">
-            <Link to="/" className="navbar-brand">
-              FrankyDJ
-            </Link>
-            <div>
-              <li>
-                <Link to="/home">Home</Link>
-              </li>
-              {showModeratorBoard && (
-                <li>
-                  <Link to="/mod">Moderador</Link>
-                </li>
-              )}
-              {showAdminBoard && (
-                <li>
-                  <Link to="/admin">Administrador</Link>
-                </li>
-              )}
-              {currentUser === true && (
-                <li>
-                  <Link to="/user">Usuario</Link>
-                </li>
-              )}
-            </div>
-            {currentUser ? (
-              <li>
-                <Link to="/user">Usuario</Link>
-              </li>
-            ) : (
-              <div></div>
-            )}
-          </nav>
-        </div>
-        <Routes>
-          <Route path="/login" element={<LoginUser />} />
-          <Route path="/product" element={<Category />} />
-          <Route path="/" element={<Navigate to="/login" />} />
-        </Routes>
-      </BrowserRouter>
-      {/** 
-    <BrowserRouter>
+    <Router>
+      <ClientNavbar isAuthenticated={isAuthenticated} />
       <Routes>
-        <Route path="/login" element={<LoginUser />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/home" element={<Inicio />} />
+        <Route path="/ous" element={<Nosotros />} />
+        <Route path="/product" element={<Producto />} />
+        {isAuthenticated && (
+          <>
+            <Route path="/admin" element={<Admin />} />
+            <Route
+              path="/logout"
+              element={<LogoutUser onLogout={handleLogout} />}
+            />
+          </>
+        )}
+        <Route path="/login" element={<LoginUser onLogin={handleLogin} />} />
+
+        <Route path="/" element={<Navigate to="/home" />} />
       </Routes>
-    </BrowserRouter>
-    */}
-    </>
+    </Router>
   );
 };
 

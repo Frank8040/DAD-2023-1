@@ -1,9 +1,7 @@
 import axios from "axios";
 
 const API_URL = "http://localhost:9090/categoria";
-// token
 const token = localStorage.getItem("token");
-// end token
 
 export const getCategoryList = () => {
   return axios.get(API_URL, {

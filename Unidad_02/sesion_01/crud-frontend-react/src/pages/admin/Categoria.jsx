@@ -6,16 +6,16 @@ import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import "jspdf-autotable";
-import Table from "../components/Table";
-import { DialogCreateUpdate, DialogDelete } from "../components/DialogCatalogo";
+import Table from "../../components/Table";
+import { DialogCreateUpdate, DialogDelete } from "../../components/DialogCatalogo";
 import {
   createCategory,
   deleteCategory,
   deleteSelectedCategories,
   getCategoryList,
   updateCategory,
-} from "../services/CategoriaService";
-import { exportToExcel, exportToPdf } from "../export/ExportFileCat";
+} from "../../services/CategoriaService";
+import { exportToExcel, exportToPdf } from "../../export/ExportFileCat";
 
 export default function Category() {
   let dataCategory = {

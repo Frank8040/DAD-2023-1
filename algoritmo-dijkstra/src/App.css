@@ -1,0 +1,21 @@
+.App {
+  text-align: center;
+}
+
+.contentPrincipal {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  text-align: left;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
